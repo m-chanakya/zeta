@@ -1,6 +1,10 @@
 <html>
 <head>
 	<title>Home page</title>
+
+	{% load static %}
+	<script src="{% static 'js/jquery.js' %}"></script>
+
 </head>
 
 <body>
@@ -9,10 +13,10 @@
 <ul>
   <li>
   	Create User
-  	<form>
+  	<form action="/create_user/" method="POST" id="registration-form">
   		{% csrf_token %}
-  		<input type="text"/ placeholder="Username"> <br>
-  		<input type="number" placeholder="Mobile Number"/> <br>
+  		<input id="name" type="text"/ placeholder="Username"> <br>
+  		<input id="mobile" type="number" placeholder="Mobile Number"/> <br>
   		<input type="submit" value="Create">
   	</form>
   </li>
@@ -38,19 +42,26 @@
   	Lock/Unlock
   	<form>
   		{% csrf_token %}
-  		<input type="text"/ placeholder="Username"> <br>
-  		<input type="number" placeholder="Mobile Number"/> <br>
+  		<input type="text"/ placeholder="User ID">
   		<input type="submit" value="Lock">
   		<input type="submit" value="Unlock">
   	</form>
   </li>
-  <li>Send Points</li>
+  <li>
+  	Send Points
+  	<form>
+  		{% csrf_token %}
+  		<input type="text"/ placeholder="User ID"> <br>
+  		<input type="number"/ placeholder="Amount"> <br>
+  		<input type="submit" value="Send">
+  	</form>
+  </li>
+  </li>
   <li>History</li>
 </ul>
 {% else %}
 Welcome {{ request.user.username }}
 {% endif %}
-
-
 <a href="/logout">Logout</a>
+<script src="{% static 'js/main.js' %}"></script>
 <body>

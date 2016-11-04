@@ -7,7 +7,7 @@ from django.core.validators import RegexValidator
 
 class Profile(models.Model):
 	user = models.OneToOneField(User, unique=True)
-	mobile_number = models.CharField(max_length=10, blank=True, validators=[RegexValidator(regex='^\d{10}$')])
+	mobile_number = models.CharField(max_length=10, validators=[RegexValidator(regex='^\d{10}$')])
 	pin = models.CharField(max_length=4)
 	points = models.IntegerField(default = 0)
 
@@ -17,8 +17,7 @@ class Profile(models.Model):
 	def save(self, *args, **kwargs):
 		if self.pk is None:
 			pin_length = 4
-			password = User.objects.make_random_password(length = pin_length)
-			self.pin = random_string
+			self.pin = User.objects.make_random_password(length = pin_length)
 		return super(Profile, self).save(*args, **kwargs)
 
 	def delete(self, *args, **kwargs):
