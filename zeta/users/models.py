@@ -3,11 +3,9 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 
-from django.core.validators import RegexValidator
-
 class Profile(models.Model):
-	user = models.OneToOneField(User, unique=True)
-	mobile_number = models.CharField(max_length=10, validators=[RegexValidator(regex='^\d{10}$')])
+	user = models.OneToOneField(User, unique=True, related_name = "profile")
+	mobile_number = models.CharField(max_length=10)
 	pin = models.CharField(max_length=4)
 	points = models.IntegerField(default = 0)
 
@@ -23,3 +21,8 @@ class Profile(models.Model):
 	def delete(self, *args, **kwargs):
 		self.user.delete()
 		return super(Profile, self).delete(*args, **kwargs)
+
+class Transcation(models.Model):
+	user = models.ForeignKey(User)
+	amount = models.IntegerField()
+	created = models.DateTimeField(auto_now_add=True)

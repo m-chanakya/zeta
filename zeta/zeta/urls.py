@@ -21,5 +21,10 @@ urlpatterns = [
 	url(r'^$', home, name="home"),
     url(r'^login', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout', auth_views.logout, name='logout'),
-    url(r'^create_user', create_user)
+    url(r'^create_user', create_user),
+    url(r'^change_password', change_password),
+    url(r'^change_pin', change_pin),
+    url(r'^lock', lock),
+    url(r'^send_money', send_money),
+    url(r'^history', history),
 ]

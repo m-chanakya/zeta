@@ -78,8 +78,167 @@ function create_user() {
     });
 };
 
+function change_password() {
+    console.log("changing password")
+    $.ajax({
+        url : "change_password/", 
+        type : "POST", 
+        data : { 
+            userid : $('#password-form #userid').val(), 
+            newpass : $('#password-form #newpass').val() 
+        },
+
+        // handle a successful response
+        success : function(json) {
+            $('#password-form #userid').val('');
+            $('#password-form #newpass').val(''); 
+            console.log(json); 
+            console.log("success");
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+};
+
+function change_pin() {
+    console.log("changing pin")
+    $.ajax({
+        url : "change_pin/", 
+        type : "POST", 
+        data : { 
+            userid : $('#pin-form #userid').val(), 
+            newpin : $('#pin-form #newpin').val() 
+        },
+
+        // handle a successful response
+        success : function(json) {
+            $('#pin-form #userid').val('');
+            $('#pin-form #newpin').val(''); 
+            console.log(json); 
+            console.log("success");
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+};
+
+function lock_user(is_active) {
+    console.log("changing user status")
+    $.ajax({
+        url : "lock/", 
+        type : "POST", 
+        data : { 
+            userid : $('#lock-form #userid').val(),
+            is_active : is_active
+        },
+
+        // handle a successful response
+        success : function(json) {
+            $('#lock-form #userid').val('');
+            console.log(json); 
+            console.log("success");
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+};
+
+function send_money(is_active) {
+    console.log("started transcation")
+    $.ajax({
+        url : "send_money/", 
+        type : "POST", 
+        data : { 
+            userid : $('#money-form #userid').val(),
+            amount : $('#money-form #amount').val()
+        },
+
+        // handle a successful response
+        success : function(json) {
+            $('#money-form #userid').val('');
+            $('#money-form #amount').val('');
+            console.log(json); 
+            console.log("success");
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+};
+
+function fetch_history(is_active) {
+    console.log("started transcation")
+    $.ajax({
+        url : "history/", 
+        type : "GET",
+        // handle a successful response
+        success : function(json) {
+            json.data.forEach(function(item){
+                console.log(item);
+                var row_item = "<tr class='entry'><td>" + item.user + "</td><td>" + item.amount + "</td><td>" + item.date +"</td><tr>"
+                $('#history #transactions').append(row_item);
+            });
+            // console.log(json); 
+            console.log("success");
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+};
+
 $('#registration-form').submit(function(event){
     event.preventDefault();
-    console.log("form submitted!");
+    console.log("reg form submitted!");
     create_user();
+});
+
+$('#password-form').submit(function(event){
+    event.preventDefault();
+    console.log("pass form submitted!");
+    change_password();
+});
+
+$('#pin-form').submit(function(event){
+    event.preventDefault();
+    console.log("pin form submitted!");
+    change_pin();
+});
+
+$('#lock-form #lock_button').click(function(event){
+    event.preventDefault();
+    console.log("user locked!");
+    lock_user("false");
+});
+
+$('#lock-form #unlock_button').click(function(event){
+    event.preventDefault();
+    console.log("user unlocked!");
+    lock_user("true");
+});
+
+$('#money-form').submit(function(event){
+    event.preventDefault();
+    console.log("transfer started");
+    send_money();
+});
+
+$("#history").click(function(event){
+    event.preventDefault();
+    console.log("fetch history");
+    $("#history #transactions .entry").remove()
+    fetch_history();
 });
