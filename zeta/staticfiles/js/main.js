@@ -152,7 +152,7 @@ function lock_user(is_active) {
     });
 };
 
-function send_money(is_active) {
+function send_money() {
     console.log("started transcation")
     $.ajax({
         url : "send_money/", 
@@ -177,19 +177,101 @@ function send_money(is_active) {
     });
 };
 
-function fetch_history(is_active) {
+function fetch_history() {
     console.log("started transcation")
     $.ajax({
         url : "history/", 
         type : "GET",
         // handle a successful response
         success : function(json) {
+            $("#transactions").empty()        
             json.data.forEach(function(item){
                 console.log(item);
-                var row_item = "<tr class='entry'><td>" + item.user + "</td><td>" + item.amount + "</td><td>" + item.date +"</td><tr>"
-                $('#history #transactions').append(row_item);
+                var row_item = "<tr><td>" + item.user + "</td><td>" + item.amount + "</td><td>" + item.date +"</td><tr>"
+                $('#transactions').append(row_item);
             });
             // console.log(json); 
+            console.log("success");
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+};
+
+function fetch_games() {
+    console.log("started transcation")
+    $.ajax({
+        url : "view_games/", 
+        type : "GET",
+        // handle a successful response
+        success : function(json) {
+            $("#game-list").empty()
+            json.data.forEach(function(item){
+                $("#game-list").append(new Option(item.type + ' ' + item.date, item.id));
+            });
+            console.log("success");
+        },
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+};
+
+function generate_auto_result() {
+    console.log("started auto result generation")
+    $.ajax({
+        url : "generate_result/", 
+        type : "POST", 
+        data : { 
+            game_type : $("#game-list option:selected").text().split(" ")[0],
+            game_id : $("#game-list option:selected").val(),
+            result_type : "auto",
+            percentage : $("#percentage").val()
+        },
+
+        // handle a successful response
+        success : function(json) {
+            $("#game-list option:selected").remove()
+            $("#percentage").val('')
+            console.log(json); 
+            console.log("success");
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+};
+
+function generate_manual_result() {
+    console.log("started manual result generation")
+    $.ajax({
+        url : "generate_result/", 
+        type : "POST", 
+        data : { 
+            game_type : $("#game-list option:selected").text().split(" ")[0],
+            game_id : $("#game-list option:selected").val(),
+            result_type : "manual",
+            A : $("#Asuit").val() + " " + $("#Avalue").val(),
+            B : $("#Bsuit").val() + " " + $("#Bvalue").val(),
+            C : $("#Csuit").val() + " " + $("#Cvalue").val(),
+        },
+
+        // handle a successful response
+        success : function(json) {
+            $("#game-list option:selected").remove()
+            $("#Asuit").val('')
+            $("#Avalue").val('')
+            $("#Bsuit").val('')
+            $("#Bvalue").val('')
+            $("#Csuit").val('')
+            $("#Cvalue").val('')
+            console.log(json); 
             console.log("success");
         },
 
@@ -230,6 +312,18 @@ $('#lock-form #unlock_button').click(function(event){
     lock_user("true");
 });
 
+$('#auto-form').submit(function(event){
+    event.preventDefault();
+    console.log("auto result form submitted!");
+    generate_auto_result();
+});
+
+$('#manual-form').submit(function(event){
+    event.preventDefault();
+    console.log("manual result form submitted!");
+    generate_manual_result();
+});
+
 $('#money-form').submit(function(event){
     event.preventDefault();
     console.log("transfer started");
@@ -239,6 +333,11 @@ $('#money-form').submit(function(event){
 $("#history").click(function(event){
     event.preventDefault();
     console.log("fetch history");
-    $("#history #transactions .entry").remove()
     fetch_history();
+});
+
+$("#games").click(function(event){
+    event.preventDefault();
+    console.log("fetch games");
+    fetch_games();
 });

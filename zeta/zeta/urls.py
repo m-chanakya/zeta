@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 from users.views import *
+from games.views import *
 
 urlpatterns = [
 	url(r'^$', home, name="home"),
@@ -27,4 +28,8 @@ urlpatterns = [
     url(r'^lock', lock),
     url(r'^send_money', send_money),
     url(r'^history', history),
+    url(r'^make_bet', make_bet),
+    url(r'^view_results', view_results),
+    url(r'^view_games', view_games),
+    url(r'^generate_result', generate_result)
 ]

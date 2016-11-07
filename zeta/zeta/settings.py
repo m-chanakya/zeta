@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
+    'games',
 ]
 
 MIDDLEWARE = [
@@ -117,8 +118,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
 USE_L10N = True
@@ -132,3 +131,7 @@ USE_TZ = True
 LOGIN_URL = "/login"
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = "/login"
+
+from celery_config import *
+
+TIME_ZONE = 'Asia/Kolkata'

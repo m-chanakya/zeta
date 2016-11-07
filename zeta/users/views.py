@@ -8,7 +8,10 @@ from django.http import HttpResponse
 
 @login_required()
 def home(request):
-	return render(request,"home.html")
+	if request.user.is_superuser:
+		return render(request,"admin_home.html")
+	else:
+		return render(request,"user_home.html")
 
 @user_passes_test(lambda u: u.is_superuser)
 def create_user(request):
@@ -151,14 +154,14 @@ def make_transaction_json(transaction):
 	return {
 		'user': transaction.user.username,
 		'amount': transaction.amount,
-		'date': transaction.created.strftime("%Y:%M:%d %H::%M")
+		'date': transaction.created.strftime("%H:%M %Y:%M:%d")
 	}
 
 @user_passes_test(lambda u: u.is_superuser)
 def history(request):
 	if request.method == 'GET':
-		response = {'status': 0, 'msg' : "Money transferred"}
+		response = {'status': 0}
 		response['data'] = []
-		for each in Transcation.objects.all().order_by("created"):
+		for each in Transcation.objects.all().order_by("-created"):
 			response['data'].append(make_transaction_json(each))
 		return HttpResponse(json.dumps(response), content_type="application/json")
