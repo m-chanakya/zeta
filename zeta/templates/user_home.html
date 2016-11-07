@@ -14,6 +14,65 @@
 
 <a href="/view_results/"><h4>Results</h4></a>
 
+<h4>Tiles</h4>
+	<table>
+		<tr>
+			<th>Group</th>
+			<th>A-1</th>
+			<th>A-2</th>
+			<th>A-3</th>
+			<th>A-4</th>
+			<th>A-5</th>
+			<th>B-1</th>
+			<th>B-2</th>
+			<th>B-3</th>
+			<th>B-4</th>
+			<th>B-5</th>
+		</tr>
+	{% for group in "ABC"|make_list %}
+		<tr>
+			<td>{{group}}</td>
+			{% for i in "123456789"|make_list %}
+				<td><input id="A-"{{i}} type="number"></td>
+			{% endfor %}
+			{% for i in "123456789"|make_list %}
+				<td><input id="B-"{{i}} type="number"></td>
+			{% endfor %}
+		</tr>
+	{% endfor %}
+	</table>
+<br>
+<h4>Cards</h4>
+<table>
+	{% for group in "ABC"|make_list %}
+
+		<tr>
+			<td>{{group}}</td>
+			<td>
+				<table>
+					<tr>
+						<th>Group</th>
+						<th>Spades</th>
+						<th>Clubs</th>
+						<th>Diamonds</th>
+						<th>Hearts</th>
+					</tr>
+
+					{% for i in "JQK"|make_list %}
+						<tr>
+						<td>{{i}}</td>
+						{% for j in "SCDH"|make_list %}
+							<td><input id={{j}}"-"{{i}} type="number"></td>
+						{% endfor %}
+						</tr>
+					{% endfor %}
+				</table>
+			</td>
+		</tr>
+
+	{% endfor %}
+</table>
+
 <a href="/logout">Logout</a>
 <script src="{% static 'js/main.js' %}"></script>
 </body>
