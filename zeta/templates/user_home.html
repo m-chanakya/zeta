@@ -12,66 +12,117 @@
 <body>
 <h1>Welcome {{ request.user.username }}</h1>
 
-<a href="/view_results/"><h4>Results</h4></a>
+<div class="panel-group" id="accordian">
 
-<h4>Tiles</h4>
-	<table>
-		<tr>
-			<th>Group</th>
-			<th>A-1</th>
-			<th>A-2</th>
-			<th>A-3</th>
-			<th>A-4</th>
-			<th>A-5</th>
-			<th>B-1</th>
-			<th>B-2</th>
-			<th>B-3</th>
-			<th>B-4</th>
-			<th>B-5</th>
-		</tr>
-	{% for group in "ABC"|make_list %}
-		<tr>
-			<td>{{group}}</td>
-			{% for i in "123456789"|make_list %}
-				<td><input id="A-"{{i}} type="number"></td>
-			{% endfor %}
-			{% for i in "123456789"|make_list %}
-				<td><input id="B-"{{i}} type="number"></td>
-			{% endfor %}
-		</tr>
-	{% endfor %}
-	</table>
-<br>
-<h4>Cards</h4>
-<table>
-	{% for group in "ABC"|make_list %}
+  <div class="panel panel-default">
+    <div id="tiles" class="panel-heading">
+  	   <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordian" href="#collapseOne">Tiles</a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse">
+      <div class="panel-body">
+		<div id="tiles-time"></div> <button id="tiles-bets">Bet</button>
+		<table id="tiles-board" class = "table">
+			<tr>
+				<th>Group</th>
+				<th>A-1</th>
+				<th>A-2</th>
+				<th>A-3</th>
+				<th>A-4</th>
+				<th>A-5</th>
+				<th>B-1</th>
+				<th>B-2</th>
+				<th>B-3</th>
+				<th>B-4</th>
+				<th>B-5</th>
+			</tr>
+		{% for group in "ABC"|make_list %}
+			<tr>
+				<td>{{group}}</td>
+				{% for i in "12345"|make_list %}
+					<td><input id="{{group}}-A-{{i}}" type="number" value=0 style="width: 4em;"></td>
+				{% endfor %}
+				{% for i in "12345"|make_list %}
+					<td><input id="{{group}}-B-{{i}}" type="number" value=0 style="width: 4em;"></td>
+				{% endfor %}
+			</tr>
+		{% endfor %}
+		</table>
+      </div>
+    </div>
+  </div>
 
-		<tr>
-			<td>{{group}}</td>
-			<td>
-				<table>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+     <h4 id="cards" class="panel-title">
+       <a data-toggle="collapse" data-parent="#accordian" href="#collapseTwo">Cards</a>
+     </h4>
+    </div>
+    <div id="collapseTwo" class="panel-collapse collapse">
+      <div class="panel-body">
+			<div id="cards-time"></div><button id="cards-bets">Bet</button>
+			<table id="cards-board" class = "table">
+				{% for group in "ABC"|make_list %}
 					<tr>
-						<th>Group</th>
-						<th>Spades</th>
-						<th>Clubs</th>
-						<th>Diamonds</th>
-						<th>Hearts</th>
+						<td>{{group}}</td>
+						<td>
+							<table class = "table">
+								<tr>
+									<th>Group</th>
+									<th>Spades</th>
+									<th>Clubs</th>
+									<th>Diamonds</th>
+									<th>Hearts</th>
+								</tr>
+
+								{% for i in "JQK"|make_list %}
+									<tr>
+									<td>{{i}}</td>
+									{% for j in "SCDH"|make_list %}
+										<td><input id="{{group}}-{{j}}-{{i}}" type="number" value=0 style="width: 4em;"></td>
+									{% endfor %}
+									</tr>
+								{% endfor %}
+							</table>
+						</td>
 					</tr>
+				{% endfor %}
+			</table>     
+		</div>
+    </div>
+  </div>
 
-					{% for i in "JQK"|make_list %}
-						<tr>
-						<td>{{i}}</td>
-						{% for j in "SCDH"|make_list %}
-							<td><input id={{j}}"-"{{i}} type="number"></td>
-						{% endfor %}
-						</tr>
-					{% endfor %}
-				</table>
-			</td>
-		</tr>
-
-	{% endfor %}
-</table>
+  <div class="panel panel-default">
+    <div id="results" class="panel-heading">
+     <h4 class="panel-title">
+       <a data-toggle="collapse" data-parent="#accordian" href="#collapseThree">Results</a>
+     </h4>
+    </div>
+    <div id="collapseThree" class="panel-collapse collapse">
+      <div class="panel-body">
+       <h3>Cards</h3>
+       <table class="table" id="cards-results">
+        <tr>
+          <th>Time</th>
+          <th>A</th>
+          <th>B</th>
+          <th>C</th>
+        </tr>
+       </table>
+       <h3>Tiles</h3>
+       <table class="table" id="tiles-results">
+        <tr>
+          <th>Time</th>
+          <th>A</th>
+          <th>B</th>
+          <th>C</th>
+        </tr>
+       </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 <a href="/logout">Logout</a>
 <script src="{% static 'js/main.js' %}"></script>

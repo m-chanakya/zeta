@@ -154,7 +154,7 @@ def make_transaction_json(transaction):
 	return {
 		'user': transaction.user.username,
 		'amount': transaction.amount,
-		'date': transaction.created.strftime("%H:%M %Y:%M:%d")
+		'date': transaction.created.strftime("%H:%M %Y:%m:%d")
 	}
 
 @user_passes_test(lambda u: u.is_superuser)

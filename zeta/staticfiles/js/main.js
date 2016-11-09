@@ -201,6 +201,37 @@ function fetch_history() {
     });
 };
 
+function fetch_results() {
+    console.log("retrieving history")
+    $.ajax({
+        url : "results/", 
+        type : "GET",
+        // handle a successful response
+        success : function(json) {
+            $("#cards-results .result").remove()        
+            json.cards.forEach(function(item){
+                console.log(item);
+                var row_item = "<tr class='result'><td>" + item.created + "</td><td>" + item.winners.A + "</td><td>" + item.winners.B +"</td><td>" + item.winners.C +"</td><tr>"
+                $('#cards-results').append(row_item);
+            });
+
+            $("#tiles-results .result").remove()        
+            json.tiles.forEach(function(item){
+                console.log(item);
+                var row_item = "<tr class='result'><td>" + item.created + "</td><td>" + item.winners.A + "</td><td>" + item.winners.B +"</td><td>" + item.winners.C +"</td><tr>"
+                $('#tiles-results').append(row_item);
+            });
+            // console.log(json); 
+            console.log("success");
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+};
+
 function fetch_games() {
     console.log("started transcation")
     $.ajax({
@@ -235,7 +266,9 @@ function generate_auto_result() {
 
         // handle a successful response
         success : function(json) {
-            $("#game-list option:selected").remove()
+            if (json.status == 0) {
+                $("#game-list option:selected").remove()
+            }
             $("#percentage").val('')
             console.log(json); 
             console.log("success");
@@ -264,13 +297,40 @@ function generate_manual_result() {
 
         // handle a successful response
         success : function(json) {
-            $("#game-list option:selected").remove()
+            if (json.status == 0) {
+                $("#game-list option:selected").remove()
+            }
             $("#Asuit").val('')
             $("#Avalue").val('')
             $("#Bsuit").val('')
             $("#Bvalue").val('')
             $("#Csuit").val('')
             $("#Cvalue").val('')
+            console.log(json); 
+            console.log("success");
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+};
+
+function make_bet(type, gameid, cellid, no_of_tickets) {
+    $.ajax({
+        url : "make_bet/", 
+        type : "POST", 
+        data : { 
+            game: type, 
+            gameid: gameid,
+            cellid: cellid,
+            tickets: no_of_tickets
+        },
+
+        // handle a successful response
+        success : function(json) {
+            $(cellid).val(0);
             console.log(json); 
             console.log("success");
         },
@@ -340,4 +400,85 @@ $("#games").click(function(event){
     event.preventDefault();
     console.log("fetch games");
     fetch_games();
+});
+
+
+$("#results").click(function(event){
+    event.preventDefault();
+    console.log("fetch results");
+    fetch_results();
+});
+
+$("#cards-bets").click(function(event){
+    event.preventDefault();
+    console.log("Card Bets being Placed");
+    var gameid = $("#cards-time").attr("game-id");
+    ['A', 'B', 'C'].forEach(function(group){
+        ['J', 'Q', 'K'].forEach(function(value) {
+            ['S', 'C', 'D', 'H'].forEach(function(suit){
+                var cellid = "#"+group+"-"+suit+"-"+value;
+                var no_of_tickets = $(cellid).val();
+                if (no_of_tickets != 0) {
+                    make_bet("cards", gameid, cellid, no_of_tickets);
+                }
+            });
+        });
+    });
+});
+
+$("#tiles-bets").click(function(event){
+    event.preventDefault();
+    console.log("Tile Bets being Placed");
+    var gameid = $("#tiles-time").attr("game-id");
+    ['A', 'B', 'C'].forEach(function(group){
+        ['1', '2', '3', '4', '5'].forEach(function(value) {
+            var cellid = "#"+group+"-A-"+value;
+            var no_of_tickets = $(cellid).val();
+            if (no_of_tickets != 0) {
+                make_bet("tiles", gameid, cellid, no_of_tickets);
+            }
+        });
+    });
+});
+
+$('#tiles').click(function(event){
+    event.preventDefault();
+    console.log("Load latest tiles game");
+    $.ajax({
+        url : "latest_tiles_game/", 
+        type : "GET", 
+
+        // handle a successful response
+        success : function(json) {
+            $("#tiles-time").text(json.created);
+            $("#tiles-time").attr("game-id", json.id);
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
+});
+
+$('#cards').click(function(event){
+    event.preventDefault();
+    console.log("Load latest cards game");
+    $.ajax({
+        url : "latest_cards_game/", 
+        type : "GET", 
+
+        // handle a successful response
+        success : function(json) {
+            $("#cards-time").text(json.created);
+            $("#cards-time").attr("game-id", json.id);
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
 });

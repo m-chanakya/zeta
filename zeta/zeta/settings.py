@@ -120,6 +120,8 @@ LANGUAGE_CODE = 'en-us'
 
 USE_I18N = True
 
+TIME_ZONE = 'Asia/Kolkata'
+
 USE_L10N = True
 
 USE_TZ = True
@@ -133,5 +135,3 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = "/login"
 
 from celery_config import *
-
-TIME_ZONE = 'Asia/Kolkata'

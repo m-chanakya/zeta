@@ -11,38 +11,125 @@ from django.utils import timezone
 from datetime import timedelta
 
 @login_required
+def latest_cards_game(request):
+	if request.method == "GET":
+		cards = Cards.objects.filter(is_result_generated=False).order_by("-created").first()
+		card_game = {'id': cards.id, 'created': cards.created.strftime("%H:%M %Y:%m:%d")}
+		return HttpResponse(json.dumps(card_game), content_type="application/json")	
+
+@login_required	
+def latest_tiles_game(request):
+	if request.method == "GET":
+		tiles = Tiles.objects.filter(is_result_generated=False).order_by("-created").first()
+		tile_game = {'id': tiles.id, 'created': tiles.created.strftime("%H:%M %Y:%m:%d")}
+		return HttpResponse(json.dumps(tile_game), content_type="application/json")
+
+@login_required
 def make_bet(request):
 	if request.method == 'POST':
 		data = request.POST
 		response = {'status': 0, "msg": "Bet placed"}
 		game_type = data.get("game", False)
+		game_id = data.get("gameid", False)
 		cell_id = data.get("cellid", False)
-		no_of_tickets = data.get("tickets", False)
-		if game_type and cell_id and no_of_tickets and game_type in ['cards', 'tiles']:
+		no_of_tickets = int(data.get("tickets", False))
+
+		print game_type, game_id, cell_id, no_of_tickets
+
+		if game_type and cell_id and no_of_tickets and no_of_tickets > 0 and game_id and game_type in ['cards', 'tiles']:
+			try:
+				group, suit, value = cell_id[1:].split('-')
+			except:
+				response['status'] = 1
+				response['msg'] = "Invalid cell chosen"
+				return HttpResponse(json.dumps(tile_game), content_type="application/json")
 			if game_type == "cards":
-				cell = CardCell.objects.filter(pk=cell_id)
+				game = Cards.objects.filter(pk = game_id)
+				if game.exists():
+					game = game.first()
+				else:
+					response['status'] = 1
+					response['msg'] = "Invaild Bet: Game doesn't exist"
+					return HttpResponse(json.dumps(response), content_type="application/json")
+
+				cell = CardCell.objects.filter(game = game, group = group, suit = suit, value = value)
 				if cell.exists():
 					cell = cell.first()
 				else:
 					response['status'] = 1
 					response['msg'] = "Invaild Bet: Cell doesn't exist"
 					return HttpResponse(json.dumps(response), content_type="application/json")
+
 				start_time = cell.game.created
 				end_time = start_time + timezone.timedelta(minutes = 20)
 				cur_time = timezone.now()
+
+				print "TIME", timezone.now()
+
 				if cur_time >= start_time and cur_time < end_time:
-					bet = CardBet.objects.create(user=request.user, cell = cell, no_of_tickets = no_of_tickets)
+					cost_of_tickets = no_of_tickets*cell.game.ticket_cost
+					if cost_of_tickets <= request.user.profile.points:
+						bet = CardBet.objects.create(user=request.user, cell = cell, no_of_tickets = no_of_tickets)
+						response['msg'] = "Bet has been placed"
+						response['data'] = {
+							'user_id': bet.user.id,
+							'points_left': bet.user.profile.points,
+							'cell': bet.cell.group + " " + bet.cell.suit + " " + bet.cell.value,
+							'game': bet.cell.game.id,
+							'no_of_tickets': bet.no_of_tickets
+						}
+					else:
+						response['status'] = 1
+						response['msg'] = "You don't have enough money buy these tickets"
 				else:
 					response['status'] = 1
 					response['msg'] = "Betting for this game is closed"
+			
 			elif game_type == "tiles":
-				cell = TileCell.objects.filter(pk=cell_id)
+
+				game = Tiles.objects.filter(pk = game_id)
+				if game.exists():
+					game = game.first()
+				else:
+					response['status'] = 1
+					response['msg'] = "Invaild Bet: Game doesn't exist"
+					return HttpResponse(json.dumps(response), content_type="application/json")
+
+				cell = TileCell.objects.filter(game = game, group = group, suit = suit, value = value)
 				if cell.exists():
 					cell = cell.first()
-					bet = TileBet.objects.create(user=request.user, cell = cell, no_of_tickets = no_of_tickets)
 				else:
 					response['status'] = 1
 					response['msg'] = "Invaild Bet: Cell doesn't exist"
+					return HttpResponse(json.dumps(response), content_type="application/json")
+
+				start_time = cell.game.created
+				end_time = start_time + timezone.timedelta(minutes = 20)
+				cur_time = timezone.now()
+
+				print "TIME", cur_time
+
+				if cur_time >= start_time and cur_time < end_time:
+					cost_of_tickets = no_of_tickets*cell.game.ticket_cost
+					print "TICKET COST", cost_of_tickets
+					print "USER POINTS", request.user.profile.points
+					if cost_of_tickets <= request.user.profile.points:
+						bet = TileBet.objects.create(user=request.user, cell = cell, no_of_tickets = no_of_tickets)
+						response['msg'] = "Bet has been placed"
+						response['data'] = {
+							'user_id': bet.user.id,
+							'points_left': bet.user.profile.points,
+							'cell': bet.cell.group + " " + bet.cell.suit + " " + bet.cell.value,
+							'game': bet.cell.game.id,
+							'no_of_tickets': bet.no_of_tickets
+						}
+					else:
+						response['status'] = 1
+						response['msg'] = "You don't have enough money buy these tickets"
+				else:
+					response['status'] = 1
+					response['msg'] = "Betting for this game is closed"
+
 		else:
 			response['status'] = 1
 			response['msg'] = "Invalid Bet"
@@ -52,12 +139,11 @@ def get_latest_game_time(request):
 	if request.method == "GET":
 		response = {'status': 0}
 
-
 def make_game_json(game, type):
 	return {
 		'id': game.id,
 		'type': type,
-		'date': game.created.strftime("%H:%M %Y:%M:%d")
+		'date': game.created.strftime("%H:%M %Y:%m:%d")
 	}
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -65,24 +151,22 @@ def view_games(request):
 	if request.method == "GET":
 		response = {'status': 0}
 		games = []
-		for each in Cards.objects.filter(is_result_generated = False).order_by("-created"):
+		for each in Cards.objects.filter(is_result_generated = False).order_by("created"):
 			games.append(make_game_json(each, "cards"))
-		for each in Tiles.objects.filter(is_result_generated = False).order_by("-created"):
+		for each in Tiles.objects.filter(is_result_generated = False).order_by("created"):
 			games.append(make_game_json(each, "tiles"))
 		response['data'] = games
 		return HttpResponse(json.dumps(response), content_type="application/json")
 
 def view_results(request):
 	if request.method == 'GET':
-		response = {'status': 0}
-		
 		card_results = []
 		for each in Cards.objects.filter(is_result_generated = True).order_by("-created"):
 			winners = {}
 			for every in each.cells.filter(winner=True):
 				winners[every.group] = every.suit+" "+every.value
 			result = {
-				'created': each.created.strftime("%H:%M %Y:%M:%d"),
+				'created': each.created.strftime("%H:%M %Y:%m:%d"),
 				'winners': winners
 			}
 			card_results.append(result)
@@ -93,12 +177,13 @@ def view_results(request):
 			for every in each.cells.filter(winner=True):
 				winners[every.group] = every.suit+" "+every.value
 			result = {
-				'created': each.created.strftime("%H:%M %Y:%M:%d"),
+				'created': each.created.strftime("%H:%M %Y:%m:%d"),
 				'winners': winners
 			}
 			tile_results.append(result)
 
-		response['data'] = {'cards': card_results, 'tiles': tile_results}
+		response = {'cards' : card_results, 'tiles' : tile_results}
+		print response
 		return HttpResponse(json.dumps(response), content_type="application/json")
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -137,6 +222,7 @@ def generate_result(request):
 					sum = 0
 					for each in cells.filter():
 						sum += each.total_bets
+					print "Total Bets", sum
 					if sum > 0:
 						diff = 100
 						ans = tuple()
@@ -144,7 +230,10 @@ def generate_result(request):
 							for eB in cells.filter(group = "B"):
 								for eC in cells.filter(group  = "C"):
 									win_percent = (eA.total_bets + eB.total_bets + eC.total_bets)*100/sum
+									if win_percent != 0:
+										print win_percent, eA, eB, eC
 									if ( win_percent <= percentage and percentage - win_percent <= diff):
+										diff = percentage - win_percent
 										ans = (eA, eB, eC)
 						cellA, cellB, cellC = ans
 					else:
@@ -211,12 +300,13 @@ def generate_result(request):
 			bets = TileBet.objects.filter(cell__in = [cellA, cellB, cellC])
 
 		for each in bets:
-			user = each.user
-			user.points += each.no_of_tickets * each.cell.game.winner_prize
-			user.save()
-			winner.append({
-				'user': user.username,
-				'points': user.points
+			print each.user.username
+			profile = each.user.profile
+			profile.points += each.no_of_tickets * each.cell.game.winner_prize
+			profile.save()
+			winners.append({
+				'user': profile.user.username,
+				'points': profile.points
 				})
 		response['data']['winners'] = winners
 

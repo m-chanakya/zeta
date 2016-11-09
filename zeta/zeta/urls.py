@@ -29,7 +29,9 @@ urlpatterns = [
     url(r'^send_money', send_money),
     url(r'^history', history),
     url(r'^make_bet', make_bet),
-    url(r'^view_results', view_results),
+    url(r'^results', view_results),
     url(r'^view_games', view_games),
-    url(r'^generate_result', generate_result)
+    url(r'^generate_result', generate_result),
+    url(r'^latest_tiles_game', latest_tiles_game),
+    url(r'^latest_cards_game', latest_cards_game),
 ]

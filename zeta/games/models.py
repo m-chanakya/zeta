@@ -46,7 +46,11 @@ class CardBet(models.Model):
 		if self.pk is None:
 			self.cell.total_bets += self.no_of_tickets
 			self.cell.save()
-		return super(Profile, self).save(*args, **kwargs)
+			cost_of_tickets = self.no_of_tickets*self.cell.game.ticket_cost
+			profile = self.user.profile
+			profile.points -= cost_of_tickets
+			profile.save()
+		return super(CardBet, self).save(*args, **kwargs)
 
 
 class Tiles(models.Model):
@@ -91,7 +95,11 @@ class TileBet(models.Model):
 		if self.pk is None:
 			self.cell.total_bets += self.no_of_tickets
 			self.cell.save()
-		return super(Profile, self).save(*args, **kwargs)
+			cost_of_tickets = self.no_of_tickets*self.cell.game.ticket_cost
+			profile = self.user.profile
+			profile.points -= cost_of_tickets
+			profile.save()
+		return super(TileBet, self).save(*args, **kwargs)
 
 
 def create_card_cells(sender, instance, created, **kwargs):
