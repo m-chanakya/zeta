@@ -308,6 +308,7 @@ def generate_result(request):
 				'user': profile.user.username,
 				'points': profile.points
 				})
+			Transaction.objects.create(user = each.user, amount = each.no_of_tickets * each.cell.game.winner_prize)
 		response['data']['winners'] = winners
 
 		return HttpResponse(json.dumps(response), content_type="application/json")

@@ -413,32 +413,41 @@ $("#cards-bets").click(function(event){
     event.preventDefault();
     console.log("Card Bets being Placed");
     var gameid = $("#cards-time").attr("game-id");
+    var total_tickets = 0;
     ['A', 'B', 'C'].forEach(function(group){
         ['J', 'Q', 'K'].forEach(function(value) {
-            ['S', 'C', 'D', 'H'].forEach(function(suit){
+            ['S', 'C', 'D', 'H'].forEach(function(suit) {
                 var cellid = "#"+group+"-"+suit+"-"+value;
                 var no_of_tickets = $(cellid).val();
+                total_tickets += parseInt(no_of_tickets)
                 if (no_of_tickets != 0) {
                     make_bet("cards", gameid, cellid, no_of_tickets);
                 }
             });
         });
     });
+    var total_cost = total_tickets*11;
+    $("#msgarea").text("Total Tickets : " + total_tickets.toString() + " Cost : " + total_cost.toString());
+
 });
 
 $("#tiles-bets").click(function(event){
     event.preventDefault();
     console.log("Tile Bets being Placed");
     var gameid = $("#tiles-time").attr("game-id");
+    var total_tickets = 0;
     ['A', 'B', 'C'].forEach(function(group){
         ['1', '2', '3', '4', '5'].forEach(function(value) {
             var cellid = "#"+group+"-A-"+value;
             var no_of_tickets = $(cellid).val();
+            total_tickets += parseInt(no_of_tickets)
             if (no_of_tickets != 0) {
                 make_bet("tiles", gameid, cellid, no_of_tickets);
             }
         });
     });
+    var total_cost = total_tickets*11;
+    $("#msgarea").text("Total Tickets : " + total_tickets.toString() + " Cost : " + total_cost.toString());
 });
 
 $('#tiles').click(function(event){

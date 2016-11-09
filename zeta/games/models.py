@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 from django.db.models.signals import post_save
 
-from django.contrib.auth.models import User
+from users.models import *
 from django.db import models
 
 class Cards(models.Model):
-	ticket_cost = models.PositiveIntegerField(default=10)
+	ticket_cost = models.PositiveIntegerField(default=11)
 	winner_prize = models.PositiveIntegerField(default=100)
 	is_result_generated = models.BooleanField(default = False)
 	created = models.DateTimeField(auto_now_add=True)
@@ -50,11 +50,12 @@ class CardBet(models.Model):
 			profile = self.user.profile
 			profile.points -= cost_of_tickets
 			profile.save()
+			Transaction.objects.create(user = self.user, amount = -1*cost_of_tickets)
 		return super(CardBet, self).save(*args, **kwargs)
 
 
 class Tiles(models.Model):
-	ticket_cost = models.PositiveIntegerField(default=10)
+	ticket_cost = models.PositiveIntegerField(default=11)
 	winner_prize = models.PositiveIntegerField(default=100)
 	is_result_generated = models.BooleanField(default = False)
 	created = models.DateTimeField(auto_now_add=True)
