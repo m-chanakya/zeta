@@ -7,6 +7,7 @@
 1. virtualenv --no-site-packages --distribute venv
 2. source venv/bin/activate
 3. pip install -r requirements.txt
+4. sudo apt-get install rabbitmq-server
 
 **Entering the virtual environment**
 
@@ -16,6 +17,14 @@
 
 1. ./manage.py makemigrations 
 2. ./manage.py migrate
+
+**Starting rabbit-mq server**
+
+1. sudo rabbitmq-server
+
+**Starting celery worker**
+
+1. celery -A zeta worker -B -l info
 
 **Starting the server:**
 
