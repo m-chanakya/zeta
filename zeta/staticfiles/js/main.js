@@ -66,8 +66,16 @@ function create_user() {
         // handle a successful response
         success : function(json) {
             $('#registration-form #name').val('');
-            $('#registration-form #mobile').val(''); 
-            console.log(json); 
+            $('#registration-form #mobile').val('');
+            if(json.status == 0)
+            {
+                var msg = "User Created: <br>";
+                msg += "Username: " + json.data.username + "<br>Mobile Number: " + json.data.mobile; 
+                msg += "<br>ID: " + json.data.id + "<br>PIN: " + json.data.pin + "<br>Password: " + json.data.password;
+                console.log(msg);
+                $("#msgarea").html(msg);
+            }
+            console.log(json);
             console.log("success");
         },
 

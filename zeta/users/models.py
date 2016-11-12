@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
 	user = models.OneToOneField(User, unique=True, related_name = "profile")
-	mobile_number = models.CharField(max_length=10)
+	mobile_number = models.CharField(max_length=10, unique=True)
 	pin = models.CharField(max_length=4)
 	points = models.IntegerField(default = 0)
 

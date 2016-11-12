@@ -10,7 +10,7 @@
   <script src="{% static 'js/bootstrap.min.js' %}" type="text/javascript"></script>
 </head>
 
-<body style="background: url('http://www.pptbackgrounds.org/uploads/poker-gambling-casino-theme-backgrounds-wallpapers.jpg') center no-repeat">
+<body style="background: url('http://guidanceforgrowing.com/wp/wp-content/uploads/2011/12/gfg_gambling.jpg'); background-size: cover">
 
 <h1>Welcome Admin</h1>
 
@@ -24,6 +24,7 @@
     </div>
     <div id="collapseOne" class="panel-collapse collapse in">
       <div class="panel-body">
+        <div id="msgarea"></div>
     	  <form action="/create_user/" method="POST" id="registration-form">
     	 	 {% csrf_token %}
     	   <input id="name" type="text"/ placeholder="Username"> <br>
