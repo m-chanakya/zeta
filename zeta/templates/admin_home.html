@@ -45,7 +45,7 @@
       <div class="panel-body">
       	<form action="/change_password/" method="POST" id="password-form">
       		{% csrf_token %}
-      		<input id="userid" type="text"/ placeholder="User ID"> <br>
+      		<input id="userid" type="text"/ placeholder="User ID or Username"> <br>
       		<input id="newpass" type="password" placeholder="New Password"/> <br>
       		<input type="submit" value="Update">
       	</form>
@@ -63,7 +63,7 @@
       <div class="panel-body">
     	 <form action="/change_pin/" method="POST" id="pin-form">
     	 	{% csrf_token %}
-    	 	<input id="userid" type="text"/ placeholder="User ID"> <br>
+    	 	<input id="userid" type="text"/ placeholder="User ID or Username"> <br>
     		<input id="newpin" type="password" placeholder="New PIN"/> <br>
     		<input type="submit" value="Update">
     	 </form>
@@ -81,7 +81,7 @@
     <div class="panel-body">
     	<form action="/lock/" method="POST" id="lock-form">
     		{% csrf_token %}
-    		<input id="userid" type="text"/ placeholder="User ID">
+    		<input id="userid" type="text"/ placeholder="User ID or Username">
     		<input id="lock_button" type="submit" value="Lock">
     		<input id="unlock_button" type="submit" value="Unlock">
     	</form>
@@ -165,7 +165,7 @@
       <div class="panel-body">
     	 <form action="/send_money/" method="POST" id="money-form">
     		{% csrf_token %}
-    		<input id="userid" type="text"/ placeholder="User ID"> <br>
+    		<input id="userid" type="text"/ placeholder="User ID or Username"> <br>
     		<input id="amount" type="number"/ placeholder="Amount"> <br>
     		<input type="submit" value="Send">
     	 </form>

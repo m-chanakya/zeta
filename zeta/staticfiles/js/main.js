@@ -53,6 +53,20 @@ $(function() {
 
 });
 
+function is_phonenumber(inputtxt)  
+{  
+  var phoneno = /^\d{10}$/;  
+  if( inputtxt.match(phoneno))
+        {  
+      return true;  
+        }  
+      else  
+        {  
+        alert("Invalid Phone Number");  
+        return false;  
+        }  
+}
+
 function create_user() {
     console.log("creating user")
     $.ajax({
@@ -74,6 +88,9 @@ function create_user() {
                 msg += "<br>ID: " + json.data.id + "<br>PIN: " + json.data.pin + "<br>Password: " + json.data.password;
                 console.log(msg);
                 $("#msgarea").html(msg);
+            }
+            else {
+                alert(json.msg);
             }
             console.log(json);
             console.log("success");
@@ -102,6 +119,9 @@ function change_password() {
             $('#password-form #newpass').val(''); 
             console.log(json); 
             console.log("success");
+            if(json.status==1) {
+                alert(json.msg);
+            }
         },
 
         // handle a non-successful response
@@ -127,6 +147,9 @@ function change_pin() {
             $('#pin-form #newpin').val(''); 
             console.log(json); 
             console.log("success");
+            if(json.status==1) {
+                alert(json.msg);
+            }
         },
 
         // handle a non-successful response
@@ -151,6 +174,9 @@ function lock_user(is_active) {
             $('#lock-form #userid').val('');
             console.log(json); 
             console.log("success");
+            if(json.status==1) {
+                alert(json.msg);
+            }
         },
 
         // handle a non-successful response
@@ -176,6 +202,9 @@ function send_money() {
             $('#money-form #amount').val('');
             console.log(json); 
             console.log("success");
+            if(json.status==1) {
+                alert(json.msg);
+            }
         },
 
         // handle a non-successful response
@@ -280,6 +309,9 @@ function generate_auto_result() {
             $("#percentage").val('')
             console.log(json); 
             console.log("success");
+            if(json.status==1) {
+                alert(json.msg);
+            }
         },
 
         // handle a non-successful response
@@ -316,6 +348,9 @@ function generate_manual_result() {
             $("#Cvalue").val('')
             console.log(json); 
             console.log("success");
+            if(json.status==1) {
+                alert(json.msg);
+            }
         },
 
         // handle a non-successful response
@@ -341,6 +376,9 @@ function make_bet(type, gameid, cellid, no_of_tickets) {
             $(cellid).val(0);
             console.log(json); 
             console.log("success");
+            if(json.status==1) {
+                alert(json.msg);
+            }
         },
 
         // handle a non-successful response
@@ -353,7 +391,7 @@ function make_bet(type, gameid, cellid, no_of_tickets) {
 $('#registration-form').submit(function(event){
     event.preventDefault();
     console.log("reg form submitted!");
-    create_user();
+    if (is_phonenumber($('#registration-form #mobile').val())) create_user();
 });
 
 $('#password-form').submit(function(event){
@@ -456,6 +494,42 @@ $("#tiles-bets").click(function(event){
     });
     var total_cost = total_tickets*11;
     $("#msgarea").text("Total Tickets : " + total_tickets.toString() + " Cost : " + total_cost.toString());
+});
+
+$('#account').click(function(event){
+    event.preventDefault();
+    console.log("Get account details");
+    $.ajax({
+        url : "account_details/", 
+        type : "GET", 
+
+        // handle a successful response
+        success : function(json) {
+            $("#account-details .details").remove()
+            var data = json.data; 
+            var row_item = "<tr class='details'><td>ID</td><td>" + data.id + "</td></tr>"
+            $('#account-details').append(row_item);
+
+            row_item = "<tr class='details'><td>Name</td><td>" + data.name + "</td></tr>"
+            $('#account-details').append(row_item);
+
+            row_item = "<tr class='details'><td>PIN</td><td>" + data.pin + "</td></tr>"
+            $('#account-details').append(row_item);
+
+            row_item = "<tr class='details'><td>Mobile</td><td>" + data.mobile + "</td></tr>"
+            $('#account-details').append(row_item);
+
+            row_item = "<tr class='details'><td>Points</td><td>" + data.points + "</td></tr>"
+            $('#account-details').append(row_item);
+
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log("error");
+        }
+    });
 });
 
 $('#tiles').click(function(event){

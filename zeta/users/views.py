@@ -13,6 +13,22 @@ def home(request):
 	else:
 		return render(request,"user_home.html")
 
+def make_user_json(user):
+	return {
+		"id": user.id,
+		"name": user.username,
+		"pin": user.profile.pin,
+		"mobile": user.profile.mobile_number,
+		"points": user.profile.points
+	}
+
+@login_required()
+def account_details(request):
+	if request.method == "GET":
+		response = {'status': 0}
+		response['data'] = make_user_json(request.user)
+		return HttpResponse(json.dumps(response), content_type="application/json")
+
 @user_passes_test(lambda u: u.is_superuser)
 def create_user(request):
 	if request.method == 'POST':
@@ -57,15 +73,18 @@ def change_password(request):
 		userid = data.get('userid', False)
 		newpass = data.get('newpass', False)
 		if userid and newpass:
-			if User.objects.filter(pk=userid).exists():
+			if userid.isdigit() and User.objects.filter(pk=userid).exists():
 				user = User.objects.filter(pk=userid).first()
-				user.set_password(newpass)
-				user.save()
-				response['data']['id'] = user.id
-				response['data']['password'] = newpass
+			elif User.objects.filter(username = userid).exists:
+				user = User.objects.filter(username = userid).first()
 			else:
 				response['status'] = 1
 				response['msg'] = "user doesn't exist"
+				return HttpResponse(json.dumps(response), content_type="application/json")
+			user.set_password(newpass)
+			user.save()
+			response['data']['id'] = user.id
+			response['data']['password'] = newpass
 		else:
 			response['status'] = 1
 			response['msg'] = "userId or new password was not entered"
@@ -80,20 +99,24 @@ def change_pin(request):
 		userid = data.get('userid', False)
 		newpin = data.get('newpin', False)
 		if userid and newpin:
-			if User.objects.filter(pk=userid).exists():
+			if userid.isdigit() and User.objects.filter(pk=userid).exists():
 				user = User.objects.filter(pk=userid).first()
-				profile = user.profile
-				try:
-					profile.pin = newpin
-					profile.save()
-				except:
-					response['status'] = 1
-					response['msg'] = "invalid pin"
-				response['data']['id'] = user.id
-				response['data']['pin'] = profile.pin
+			elif User.objects.filter(username = userid).exists:
+				user = User.objects.filter(username = userid).first()
 			else:
 				response['status'] = 1
 				response['msg'] = "user doesn't exist"
+				return HttpResponse(json.dumps(response), content_type="application/json")
+			profile = user.profile
+			try:
+				profile.pin = newpin
+				profile.save()
+			except:
+				response['status'] = 1
+				response['msg'] = "invalid pin"
+			response['data']['id'] = user.id
+			response['data']['pin'] = profile.pin
+			
 		else:
 			response['status'] = 1
 			response['msg'] = "userId or new pin was not entered"
@@ -108,18 +131,21 @@ def lock(request):
 		userid = data.get('userid', False)
 		is_active = data.get('is_active', False)
 		if userid and is_active:
-			if User.objects.filter(pk=userid).exists():
+			if userid.isdigit() and User.objects.filter(pk=userid).exists():
 				user = User.objects.filter(pk=userid).first()
-				if is_active == "true":
-					user.is_active = True
-				elif is_active == "false":
-					user.is_active = False
-				user.save()
-				response['data']['id'] = user.id
-				response['data']['status'] = user.is_active
+			elif User.objects.filter(username = userid).exists:
+				user = User.objects.filter(username = userid).first()
 			else:
 				response['status'] = 1
 				response['msg'] = "user doesn't exist"
+				return HttpResponse(json.dumps(response), content_type="application/json")
+			if is_active == "true":
+				user.is_active = True
+			elif is_active == "false":
+				user.is_active = False
+			user.save()
+			response['data']['id'] = user.id
+			response['data']['status'] = user.is_active
 		else:
 			response['status'] = 1
 			response['msg'] = "userId or lock/unlock was not entered"
@@ -134,17 +160,20 @@ def send_money(request):
 		userid = data.get('userid', False)
 		amount = int(data.get('amount', False))
 		if userid and amount and amount>=0:
-			if User.objects.filter(pk=userid).exists():
+			if userid.isdigit() and User.objects.filter(pk=userid).exists():
 				user = User.objects.filter(pk=userid).first()
-				profile = user.profile
-				profile.points += amount
-				profile.save()
-				transaction = Transcation.objects.create(user = user, amount = amount)
-				response['data']['id'] = user.id
-				response['data']['points'] = profile.points
+			elif User.objects.filter(username = userid).exists:
+				user = User.objects.filter(username = userid).first()
 			else:
 				response['status'] = 1
 				response['msg'] = "user doesn't exist"
+				return HttpResponse(json.dumps(response), content_type="application/json")
+			profile = user.profile
+			profile.points += amount
+			profile.save()
+			transaction = Transcation.objects.create(user = user, amount = amount)
+			response['data']['id'] = user.id
+			response['data']['points'] = profile.points
 		else:
 			response['status'] = 1
 			response['msg'] = "userId or correct amount was not entered"

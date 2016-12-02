@@ -34,4 +34,5 @@ urlpatterns = [
     url(r'^generate_result', generate_result),
     url(r'^latest_tiles_game', latest_tiles_game),
     url(r'^latest_cards_game', latest_cards_game),
+    url(r'^account_details', account_details),
 ]
